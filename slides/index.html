@@ -1,0 +1,204 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>Functional Programming for the Everyday Developer</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+        <!-- Custom css -->
+        <link rel="stylesheet" href="css/style.css">
+
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+                <section>
+                    <h1>Functional Programming</h1>
+                    <h3>for the Everyday Developer</h3>
+                </section>
+                <section data-title>
+                    <h2>Motivation<h2>
+                </section>
+                <section data-quit>
+                    <h2>Questions?</h2>
+                </section>
+                <section data-markdown>
+                    <script type="text/template">
+## References
+                    </script>
+                </section>
+                <section>
+                    <h2>Thank you!</h2>
+                </section>
+            </div>
+        </div>
+        <div class="sources">
+            <!-- <div class="source" data-source="category"><a href="https://en.wikipedia.org/wiki/Category_(mathematics)" target="_blank">https://en.wikipedia.org/wiki/Category_(mathematics)</a></div> -->
+        </div>
+        <div class="blank">
+            <div class="text">This slide intentionally left blank</div>
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                history: true,
+
+                // More info https://github.com/hakimel/reveal.js#dependencies
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+                ]
+            });
+
+            Reveal.addEventListener('slidechanged', checkSources);
+
+            function checkSources(event) {
+                var slide = event.currentSlide,
+                    sources = document.querySelector('.sources'),
+                    source = slide.getAttribute('data-source');
+
+                sources.querySelectorAll('.source.active').forEach(function(source) {
+                    source.classList.remove('active');
+                });
+                sources.classList.remove('active');
+
+                if (source) {
+                    sources.querySelectorAll('.source[data-source="' + source + '"]').forEach(function(source) {
+                        source.classList.add('active');
+                    });
+                    sources.classList.add('active');
+                }
+            }
+
+            Reveal.addEventListener('fragmentshown', skipFragmentsNext);
+            Reveal.addEventListener('fragmenthidden', skipFragmentsPrev);
+
+            function skipFragmentsNext(event) {
+                var fragment = event.fragment,
+                    skip = fragment.hasAttribute('data-skip-next');
+
+                if (skip) {
+                    Reveal.nextFragment();
+                }
+            }
+
+            function skipFragmentsPrev(event) {
+                var fragment = event.fragment,
+                    skip = fragment.hasAttribute('data-skip-prev');
+
+                if (skip) {
+                    Reveal.prevFragment();
+                }
+            }
+
+            Reveal.addEventListener('fragmentshown', checkHighlight);
+            Reveal.addEventListener('fragmenthidden', checkHighlight);
+
+            function checkHighlight(event) {
+                var fragment = document.querySelector('.current-fragment'),
+                    highlight = fragment && fragment.getAttribute('data-highlight');
+
+                document.querySelectorAll('[data-highlight]:not(.fragment)').forEach(function(element) {
+                    element.classList.remove('highlight');
+                });
+
+                if (highlight) {
+                    document.querySelectorAll('[data-highlight="' + highlight + '"]:not(.fragment)').forEach(function(element) {
+                        element.classList.add('highlight');
+                    });
+                }
+            }
+
+            Reveal.addEventListener('slidechanged', checkBlanks);
+
+            function checkBlanks(event) {
+                var slide = event.currentSlide,
+                    blank = slide.hasAttribute('data-blank');
+
+                if (blank) {
+                    document.querySelector('.blank .text').classList.add('active');
+                } else {
+                    document.querySelector('.blank .text').classList.remove('active');
+                }
+            }
+
+            document.addEventListener('keydown', function(event) {
+                var indices = Reveal.getIndices(),
+                    slides,
+                    quitSlide,
+                    quitSlideIndex;
+
+                if (event.key.toUpperCase() === 'Q') {
+                    slides = document.querySelectorAll('.slides > section');
+                    quitSlide = document.querySelector('.slides > section[data-quit]');
+                    quitSlideIndex = Array.prototype.indexOf.call(slides, quitSlide);
+
+                    Reveal.slide(quitSlideIndex, -1, -1);
+                    return;
+                }
+
+                if (event.shiftKey) {
+                    switch (event.key) {
+                    case 'ArrowUp':
+                        Reveal.slide(indices.h, indices.v - 1, -1);
+                        return;
+                    case 'ArrowDown':
+                        Reveal.slide(indices.h, indices.v + 1, -1);
+                        return;
+                    case 'ArrowLeft':
+                        Reveal.slide(indices.h - 1, undefined, -1);
+                        return;
+                    case 'ArrowRight':
+                        Reveal.slide(indices.h + 1, undefined, -1);
+                        return;
+                    }
+                }
+
+                if (event.altKey) {
+                    switch (event.key) {
+                    case 'ArrowUp':
+                        Reveal.slide(indices.h, -1, -1);
+                        return;
+                    case 'ArrowLeft':
+                        Reveal.slide(indices.h - 1, -1, -1);
+                        return;
+                    case 'ArrowRight':
+                        Reveal.slide(indices.h + 1, -1, -1);
+                        return;
+                    }
+                }
+
+                if (event.metaKey || event.ctrlKey) {
+                    switch (event.key) {
+                    case 'ArrowUp':
+                        Reveal.slide(indices.h, indices.v - 1, 999);
+                        return;
+                    case 'ArrowDown':
+                        Reveal.slide(indices.h, indices.v + 1, 999);
+                        return;
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>
