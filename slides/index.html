@@ -30,8 +30,804 @@
                     <h1>Functional Programming</h1>
                     <h3>for the Everyday Developer</h3>
                 </section>
-                <section data-title>
-                    <h2>Motivation<h2>
+                <section>
+                    <h2>Motivation</h2>
+                </section>
+                <section>
+                    <section>
+                        <h2>What is Functional Programming?</h2>
+                    </section>
+                    <section>
+                        <h2>Definition</h2>
+                    </section>
+                    <section>
+                        <h2>History</h2>
+                        <ul>
+                            <li>1930's - Alonzo Church: Lambda calculus</li>
+                            <li>1950's - John McCarthy: Lisp</li>
+                            <li>1970's - John Backus' 1977 Turing Award lecture</li>
+                            <li>1970's - Robin Milner: ML</li>
+                            <li>1990's - Haskell</li>
+                            <li>Present day - ECMAScript</li>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Why Functional Programming?</h2>
+                    </section>
+                    <section>
+                        <h2>Developer values</h2>
+                        <ul>
+                            <li>Produces easy to test code</li>
+                            <li>Encourages small and generic solutions which are naturally reusable</li>
+                            <li>Teaches a completely new way of reasoning about the same problems</li>
+                            <li>Rewards high-level modeling and problem solving, instead of low-level specifics</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Business values</h2>
+                        <ul>
+                            <li>Easier to test code means lower QA costs</li>
+                            <li>Reusable code lowers developement costs</li>
+                            <li>Higher-quality products increases overall customer satisfaction</li>
+                            <li>Natural fit for serverless architectures/FaaS</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>The challenges</h2>
+                    </section>
+                    <section>
+                        <h2>The dreaded learning curve</h2>
+                    </section>
+                    <section data-source="learning-curve">
+                        <img data-src="assets/images/haskell.png">
+                    </section>
+                    <section>
+                        <h2>Rewiring your brain</h2>
+                    </section>
+                    <section>
+                        <h2>Building a culture</h2>
+                    </section>
+                </section>
+                <section>
+                    <h2>Core concepts &amp; foundations</h2>
+                </section>
+                <section>
+                    <section>
+                        <h2>Composability</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Combine small functions into more complex functions</li>
+                            <li>Rewards creating small and generic functions</li>
+                            <li>Defines a pattern for code reuse</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-wrap data-noescape>
+const orders = [{paid: false, total: 20}, {paid: true, total: 10}, {paid: true, total: 40}, {paid: false, total: 30}];
+
+<span class="fragment">const filterUnpaid = orders => orders.filter(order => order.paid);</span>
+<span class="fragment">const getTotals = orders => orders.map(order => order.total);</span>
+<span class="fragment">const sum = values => values.reduce((sum, value) => sum + value, 0);</span>
+
+<span class="fragment">sum(getTotals(filterUnpaid(orders)));</span>
+<span class="fragment output">50</span>
+
+<span class="fragment">const sumUnpaidTotals = orders => sum(getTotals(filterUnpaid(orders)));</span>
+
+<span class="fragment">sumUnpaidTotals(orders);</span>
+<span class="fragment output">50</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-wrap data-noescape>
+const sumUnpaidTotals = orders => sum(getTotals(filterUnpaid(orders)));
+
+<span class="fragment">// sumUnpaidTotals = sum . getTotals . filterUnpaid</span>
+
+<span class="fragment">const compose = <span class="fragment highlight-current">(...fns)</span> => fns.reduce(<span class="fragment highlight-current">(cfn, fn)</span> => <span class="fragment highlight-current">x => cfn(fn(x))</span>, <span class="fragment highlight-current">x => x</span>);</span>
+
+<span class="fragment">const sumUnpaidTotalsᐟ = compose(sum, getTotals, filterUnpaid);</span>
+
+<span class="fragment">sumUnpaidTotalsᐟ(orders);</span>
+<span class="fragment output">50</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>`bind` operator</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Allows explicitly binding the value of `this`</li>
+                            <li>Allows chain-style calling of functions</li>
+                            <li>Does not allow higher-order compose</li>
+                            <li>TC-39 Stage 0 for about 3 years now...</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-large>
+function filterUnpaid() { return this.filter(order => order.paid); }
+function getTotals() { return this.map(order => order.total); }
+function sum() { return this.reduce((sum, value) => sum + value, 0); }
+
+<span class="fragment">orders
+    ::filterUnpaid()
+    ::getTotals()
+    ::sum();</span>
+<span class="fragment output">50</span>
+
+<span class="fragment">const sumUnpaidTotals = orders => orders
+    ::filterUnpaid()
+    ::getTotals()
+    ::sum();</span>
+
+<span class="fragment">sumUnpaidTotals(orders);</span>
+<span class="fragment output">50</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>`pipeline` operator</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Syntactic sugar over single-argument function call</li>
+                            <li>Allows chain-style calling of functions</li>
+                            <li>Might allow higher-order compose</li>
+                            <li>Not presented to TC-39 yet. Championed since 3 weeks ago.</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const filterUnpaid = orders => orders.filter(order => order.paid);
+const getTotals = orders => orders.map(order => order.total);
+const sum = values => values.reduce((sum, value) => sum + value, 0);
+
+<span class="fragment">orders
+    |> filterUnpaid
+    |> getTotals
+    |> sum;</span>
+<span class="fragment output">50</span>
+
+<span class="fragment">const sumUnpaidTotals = |> filterUnpaid |> getTotals |> sum;</span>
+
+<span class="fragment">sumUnpaidTotals(orders);</span>
+<span class="fragment output">50</span>
+<span class="fragment">// Maybe... ¯\_(ツ)_/¯</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Arity</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Refers to the number of arguments a function will take</li>
+                            <li>Rewards unary functions, especially in JavaScript, as all functions return a single value</li>
+                            <li>Simplifies composability</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-large>
+const len = xs => xs.length;
+const isOdd = n => n % 2;
+
+<span class="fragment">len('hello');</span>
+<span class="fragment output">5</span>
+<span class="fragment">isOdd(3);</span>
+<span class="fragment output">true</span>
+
+<span class="fragment">const add = (a, b) => a + b;</span>
+
+<span class="fragment">add(3, 4);</span>
+<span class="fragment output">7</span>
+
+<span class="fragment">// const sum = values => values.reduce((sum, value) => sum + value, 0);</span>
+<span class="fragment">const sum = (...values) => values.reduce((sum, value) => sum + value, 0);
+// `arguments` is dead!</span>
+
+<span class="fragment">sum(1, 2, 3, 4, 5);</span>
+<span class="fragment output">15</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Currying</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Allows transforming non-unary functions into unary functions</li>
+                            <li>Rewards function specialization via partial application</li>
+                            <li>Leveraged upon higher-order functions</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-large>
+const add = (a, b) => a + b;
+
+<span class="fragment">const addᐟ = a => b => a + b;</span>
+
+<span class="fragment">addᐟ(3)(4); // I know... lots of parens...</span>
+<span class="fragment output">7</span>
+
+<span class="fragment">const map = fn => xs => xs.map(fn);</span>
+<span class="fragment">const filter = pr => xs => xs.filter(pr);</span>
+<span class="fragment">const reduce = fn => initial => xs => xs.reduce(fn, initial);</span>
+
+<span class="fragment">// const filterUnpaid = orders => orders.filter(order => order.paid);</span>
+<span class="fragment">const filterUnpaid = filter(order => order.paid);</span>
+<span class="fragment">// const getTotals = orders => orders.map(order => order.total);</span>
+<span class="fragment">const getTotals = map(order => order.total);</span>
+<span class="fragment">// const sum = values => values.reduce((sum, value) => sum + value, 0);</span>
+<span class="fragment">const sum = reduce((sum, value) => sum + value)(0);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const curry = <span class="fragment highlight-current">fn</span> => <span class="fragment highlight-current"><span class="fragment highlight-current">(...args)</span> => {
+    <span class="fragment highlight-current">const nfn = fn.bind(null, ...args);</span>
+
+    return <span class="fragment highlight-current">nfn.length</span> ? <span class="fragment highlight-current">curry(nfn)</span> : <span class="fragment highlight-current">nfn.call()</span>;
+}</span>;
+
+<span class="fragment">const uncurry = <span class="fragment highlight-current">fn</span> =>
+<span class="fragment highlight-current"><span class="fragment highlight-current">(...args)</span> => args.reduce(<span class="fragment highlight-current">(fn, arg) => fn(arg)</span>, <span class="fragment highlight-current">fn</span>)</span>;</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const add = (a, b, c, d) => a + b + c + d;
+
+<span class="fragment">add(1, 2, 3, 4);</span>
+<span class="fragment output">10</span>
+
+<span class="fragment">const addᐟ = curry(add);</span>
+<span class="fragment">addᐟ(1)(2)(3)(4);</span>
+<span class="fragment output">10</span>
+
+<span class="fragment">addᐟ(1)(2, 3)(4);</span>
+<span class="fragment output">10</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const addᐟ = a => b => c => d => a + b + c + d;
+
+<span class="fragment">addᐟ(1)(2)(3)(4);</span>
+<span class="fragment output">10</span>
+
+<span class="fragment">const add = uncurry(addᐟ);</span>
+<span class="fragment">add(1, 2, 3, 4);</span>
+<span class="fragment output">10</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Partial application</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Allows specialization of curried functions</li>
+                            <li>Rewards reusability of customizable functions</li>
+                            <li>Simplifies testing by encouraging dependency injection</li>
+                            <li>Leveraged upon higher-order functions</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const map = fn => xs => xs.map(fn);
+const filter = pr => xs => xs.filter(pr);
+const reduce = fn => initial => xs => xs.reduce(fn, initial);
+
+<span class="fragment">const filterUnpaid = filter(order => order.paid);</span>
+<span class="fragment">const getTotals = map(order => order.total);</span>
+<span class="fragment">const sum = reduce((sum, value) => sum + value)(0);</span>
+
+<span class="fragment">const filterOverdrawn(account => account.balance < 0);</span>
+<span class="fragment">const fullName = map(person => person.firstName + ' ' + person.lastName);</span>
+<span class="fragment">const max = reduce((max, value) => Math.max(max, value))(-Infinity);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const makeListClients = fetch => clientsUrl =>
+    () => fetch(clients).then(map(enhanceModel));
+
+<span class="fragment">const fetch = require('node-fetch');</span>
+<span class="fragment">// const fetch = require('got');</span>
+
+<span class="fragment">const listClients = makeListClients(fetch)('http://localhost/clients');</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Higher-order functions</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Functions should be able to take functions as arguments and return functions as values</li>
+                            <li>Enables many of the techniques already illustrated</li>
+                            <li>Requires functions as first-class citizens</li>
+                            <li>Benefits from lightweight syntax for function declarations (lambdas)</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap>
+const orders = [{paid: false, total: 20}, {paid: true, total: 10}, {paid: true, total: 40}, {paid: false, total: 30}];
+
+<span class="fragment">orders.sort((orderA, orderB) => orderA.total - orderB.total);</span>
+<span class="fragment output">[{paid: true, total: 10}, {paid: false, total: 20}, {paid: false, total: 30}, {paid: true, total: 40}]</span>
+
+<span class="fragment">document.getElementById('main').addEventListener('click', function() {
+    console.log('`main` clicked!');
+});</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const map = fn => xs => xs.map(fn);
+const filter = pr => xs => xs.filter(pr);
+const reduce = fn => initial => xs => xs.reduce(fn, initial);
+
+<span class="fragment">const addᐟ = a => b => c => d => a + b + c + d;</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Side effects</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Refers to actions triggered by a function other than simply returning a value based on its read-only arguments</li>
+                            <li>Introduce unnecessary complexity and coupling</li>
+                            <li>Increment the chances of errors introduced by refactoring</li>
+                            <li>Make it harder to reason about code</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-large>
+const add = a => b => (console.log(`adding ${a} + ${b}`), a + b);
+
+<span class="fragment">const open = url => window.open(url);</span>
+
+<span class="fragment">const get = url => new Promise((res) => {
+    const xhr = new XMLHttpRequest();
+
+    xhr.open('GET', url, true);
+    xhr.addEventListener('load', () => res(xhr.responseText));
+    xhr.send();
+});</span>
+
+<span class="fragment">const { readFile } = require('fs');
+
+const read = utils.promisify(readFile);</span>
+
+<span class="fragment">const sort = fn => xs => xs.sort(fn);</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Purity</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Refers to lack of side-effects, and a true mapping between input and output</li>
+                            <li>Enables equational reasoning</li>
+                            <li>Enables deducing and proving theorems about our code</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const timestamp = () => Date.now();
+
+<span class="fragment">const random = () => Math.random();</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Referential Transparency</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Refers to the ability to reason mathematically about equality (assignment) in our code</li>
+                            <li>Enables equality-based refactoring by replacing function calls with their returns values</li>
+                            <li>Enables memoization/caching</li>
+                            <li>Enabled by function purity</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap>
+const add = a => b => a + b;
+
+<span class="fragment">add(3)(4);</span>
+<span class="fragment output">7</span>
+<span class="fragment">add(3)(4);</span>
+<span class="fragment output">7</span>
+<span class="fragment">add(3)(4);</span>
+<span class="fragment output">7</span>
+
+<span class="fragment">const random = () => Math.random();</span>
+<span class="fragment output">0.7395772287235214</span>
+<span class="fragment">const random = () => Math.random();</span>
+<span class="fragment output">0.820826709410488</span>
+<span class="fragment">const random = () => Math.random();</span>
+<span class="fragment output">0.5867262899587959</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Equational reasoning</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Refers to the ability to reason mathematically about our code</li>
+                            <li>Enables refactoring based on code theorems</li>
+                            <li>Enabled by function purity</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap>
+const orders = [{paid: false, total: 20}, {paid: true, total: 10}, {paid: true, total: 40}, {paid: false, total: 30}];
+
+<span class="fragment">const setValue = unitPrice => order => Object.assign(order, {value: order.total * unitPrice});</span>
+<span class="fragment">const toString = order => `${order.total} units for ${order.value}$ (${order.paid ? 'paid' : 'unpaid'})`;</span>
+
+<span class="fragment">const processOrders = compose(map(toString), map(setValue(5)));</span>
+<span class="fragment">const processOrdersᐟ = map(compose(toString, setValue(5)));</span>
+
+<span class="fragment">processOrders(orders) == processOrdersᐟ(orders);</span>
+<span class="fragment output">true</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap>
+const orders = [{paid: false, total: 20}, {paid: true, total: 10}, {paid: true, total: 40}, {paid: false, total: 30}];
+
+<span class="fragment">const paid = order => order.paid;</span>
+<span class="fragment">const large = order => order.total > 25;</span>
+
+<span class="fragment">const filterOrders = compose(filter(large), filter(paid));</span>
+<span class="fragment">const and = pra => prb => x => pra(x) && prb(x);</span>
+<span class="fragment">const filterOrdersᐟ = filter(and(paid)(large));</span>
+
+<span class="fragment">processOrders(orders) == processOrdersᐟ(orders);</span>
+<span class="fragment output">true</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>Algebraic type system</h2>
+                    </section>
+                    <section>
+                        <ul>
+                            <li>Allows abstracting generic logic into our data types</li>
+                            <li>Aims to build mathematical structures based on types and operations (algebras)</li>
+                            <li>Enables equational reasoning</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const sum = reduce(<span class="fragment highlight-current" data-highlight="reduce-1">(sum, value)</span> => <span class="fragment highlight-current" data-highlight="reduce-2">sum + value</span>)(<span class="fragment highlight-current" data-highlight="reduce-3">0</span>);
+
+const max = reduce(<span data-highlight="reduce-1">(max, value)</span> => <span data-highlight="reduce-2">Math.max(max, value)</span>)(<span data-highlight="reduce-3">-Infinity</span>);
+
+const compose = reduce(<span data-highlight="reduce-1">(cfn, fn)</span> => <span data-highlight="reduce-2">x => cfn(fn(x))</span>)(<span data-highlight="reduce-3">x => x</span>);
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+function Sum(x) {
+    this._value = x;
+}
+
+<span class="fragment">Sum.prototype.concat = function(<span class="fragment highlight-current">rhs</span>) {
+    return new Sum(<span class="fragment highlight-current">this._value + rhs._value</span>);
+};</span>
+
+<span class="fragment">Sum.empty = () => new Sum(0);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+function Max(x) {
+    this._value = x;
+}
+
+<span class="fragment">Max.prototype.concat = function(<span class="fragment highlight-current">rhs</span>) {
+    return new Max(<span class="fragment highlight-current">Math.max(this._value, rhs._value</span>);
+};</span>
+
+<span class="fragment">Max.empty = () => new Max(-Infinity);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+function Fun(x) {
+    this._value = x;
+}
+
+<span class="fragment">Fun.prototype.concat = function(<span class="fragment highlight-current">rhs</span>) {
+    return new Fun(<span class="fragment highlight-current">x => this._value(rhs._value(x))</span>);
+};</span>
+
+<span class="fragment">Fun.empty = () => new Fun(x => x);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap>
+const foldM = Monoid => reduce(<span class="fragment highlight-current">(acc, val) => acc.concat(val)</span>, <span class="fragment highlight-current">Monoid.empty()</span>);
+
+<span class="fragment">const sum = foldM(Sum);</span>
+<span class="fragment">const max = foldM(Max);</span>
+<span class="fragment">const compose = foldM(Fun);</span>
+
+<span class="fragment">const prod = foldM(Prod);</span>
+<span class="fragment">const flatten = foldM(List);</span>
+<span class="fragment">const join = foldM(Str);</span>
+                        </code></pre>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h2>How do we apply Functional Programming?</h2>
+                    </section>
+                    <section>
+                        <h2>You already are!</h2>
+                        <ul>
+                            <li>Promises</li>
+                            <li>Observables/Streams</li>
+                            <li>Array.prototype.[map|filter|reduce]</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>Ok, but how do we do more?</h2>
+                    </section>
+                    <section>
+                        <h2>Start small</h2>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-large data-wrap>
+<span class="fragment">const map = fn => xs => xs.map(fn);</span>
+<span class="fragment">const filter = pr => xs => xs.filter(pr);</span>
+<span class="fragment">const reduce = fn => initial => xs => xs.reduce(fn, initial);</span>
+
+<span class="fragment">const sum = reduce((sum, value) => sum + value)(0);</span>
+<span class="fragment">const max = reduce((max, value) => Math.max(max, value))(-Infinity);</span>
+<span class="fragment">const compose = reduce((cfn, fn) => x => cfn(fn(x)))(x => x);</span>
+
+<span class="fragment">const curry = fn => (...args) => {
+    const nfn = fn.bind(null, ...args);
+
+    return nfn.length ? curry(nfn) : nfn.call();
+};</span>
+
+<span class="fragment">const uncurry = fn =>
+(...args) => args.reduce((fn, arg) => fn(arg), fn);</span>
+
+<span class="fragment">const foldM = Monoid => reduce((acc, val) => acc.concat(val), Monoid.empty());</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+const effect = fn => x => (fn(x), x);
+
+<span class="fragment">const id = x => x;</span>
+<span class="fragment">const always = x => () => x;</span>
+<span class="fragment">const iif = pr => t => f => x => pr(x) ? t(x) : f(x);</span>
+<span class="fragment">const not = pr => x => !pr(x);</span>
+<span class="fragment">const and = pra => prb => x => pra(x) && prb(x);</span>
+<span class="fragment">const or = pra => prb => x => pra(x) || prb(x);</span>
+<span class="fragment">const equals = x => y => x === y;</span>
+
+<span class="fragment">const all = pr => xs => xs.reduce((v, x) => v && pr(x), true);</span>
+<span class="fragment">const none = pr => xs => xs.reduce((v, x) => v && !pr(x), true);</span>
+
+<span class="fragment">const effectP = fn => x => fn(x).then(() => x);</span>
+
+<span class="fragment">const keys = Object.keys.bind(Object);</span>
+<span class="fragment">const mapO = fn => map => keys(map).reduce((newMap, key) => Object.assign(newMap, {[key]: fn(map[key])}), {});</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Curry all the things</h2>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape>
+const map = fn => xs => xs.map(fn);
+const filter = pr => xs => xs.filter(pr);
+const reduce = fn => xs => xs.reduce(fn);
+
+<span class="fragment">const flip = fn => b => a => fn(a)(b);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Parametrize all the things</h2>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+const getOrCreateCustomer = <span class="fragment highlight-current" data-highlight="parametrize-a"><span data-highlight="parametrize-1">customerData</span></span> => <span class="fragment highlight-current" data-highlight="parametrize-b"><span data-highlight="parametrize-2">createCustomer</span>(customerData)</span>
+    .catch(() => <span class="fragment highlight-current" data-highlight="parametrize-c"><span data-highlight="parametrize-3">getCustomerByName</span>(customerData)</span>);
+
+const getOrCreateUser = <span data-highlight="parametrize-a"><span data-highlight="parametrize-1">userData</span></span> => <span data-highlight="parametrize-b"><span data-highlight="parametrize-2">createUser</span>(userData)</span>
+    .catch(() => <span data-highlight="parametrize-c"><span data-highlight="parametrize-3">getUserByEmail</span>(userData)</span>);
+
+<span class="fragment">const makeGetOrCreate = <span class="fragment highlight-current">(creator, getter)</span> => <span class="fragment highlight-current" data-highlight="parametrize-1">modelData</span> => <span class="fragment highlight-current" data-highlight="parametrize-2">creator</span>(modelData)
+    .catch(() => <span class="fragment highlight-current" data-highlight="parametrize-3">getter</span>(modelData));</span>
+
+<span class="fragment">const getOrCreateCustomerᐟ = makeGetOrCreate(createCustomer, getCustomerByName);</span>
+<span class="fragment">const getOrCreateUserᐟ = makeGetOrCreate(createUser, getUserByEmail);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Follow the data</h2>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+// getCustomer :: <span class="fragment highlight-current">customerId</span> -> <span class="fragment highlight-current">Promise Customer</span>
+// getCustomerOrders :: <span class="fragment highlight-current">customerId</span> -> <span class="fragment highlight-current">Promise (List Order)</span>
+// getProvider :: <span class="fragment highlight-current">providerId</span> -> <span class="fragment highlight-current">Promise Provider</span>
+
+<span class="fragment">// <span class="fragment highlight-current">EnhancedCustomer</span> :: { <span class="fragment highlight-current">Customer</span>, <span class="fragment highlight-current">providers: List Provider</span> }
+// getEnhancedCustomer :: <span class="fragment highlight-current">customerId</span> -> <span class="fragment highlight-current">Promise EnhancedCustomer</span></span>
+
+<span class="fragment">const getEnhancedCustomer = <span class="fragment highlight-current">customerId</span> => <span class="fragment highlight-current">getCustomer(customerId)</span>
+    .then(<span class="fragment highlight-current">customer</span> => {
+        <span class="fragment highlight-current">return <span class="fragment highlight-current">getCustomerOrders(customerId)</span>
+            .then(<span class="fragment highlight-current">orders</span> => {
+                return <span class="fragment highlight-current">Promise.all</span>(<span class="fragment highlight-current">orders.map</span>(<span class="fragment highlight-current">order => getProvider(order.providerId)</span>));
+            })
+            .then(<span class="fragment highlight-current">providers</span> => {
+                return <span class="fragment highlight-current">Object.assign(customer, {providers})</span>;
+            });</span>
+    });</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+// getCustomer :: customerId -> Promise Customer
+// getCustomerOrders :: customerId -> Promise (List Order)
+// getProvider :: providerId -> Promise Provider
+
+// EnhancedCustomer :: { Customer, providers: List Provider }
+// getEnhancedCustomer :: customerId -> Promise EnhancedCustomer
+
+<span class="fragment">// getCustomerAndOrders :: <span class="fragment highlight-current">customerId</span> -> <span class="fragment highlight-current">Promise (Pair (Customer, List Order))</span></span>
+<span class="fragment">// mapOrdersToProviders :: <span class="fragment highlight-current">Pair (Customer, List Orders)</span> -> <span class="fragment highlight-current">Promise (Pair (Customer, List Provider))</span></span>
+<span class="fragment">// enhanceCustomer :: <span class="fragment highlight-current">Pair (Customer, List Provider)</span> -> <span class="fragment highlight-current">Promise EnhancedCustomer</span></span>
+
+<span class="fragment">const getEnhancedCustomer = customerId => <span class="fragment highlight-current">Promise.resolve(customerId)</span>
+    .then(<span class="fragment highlight-current">getCustomerAndOrders</span>)
+    .then(<span class="fragment highlight-current">mapOrdersToProviders</span>)
+    .then(<span class="fragment highlight-current">enhanceCustomer</span>);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>It's functions all the way down...</h2>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+const p = x => Promise.resolve(x);
+<span class="fragment">const pair = (fnL, fnR) => x => [fnL(x), fnR(x)];</span>
+<span class="fragment">const resolveAll = Promise.all.bind(Promise);</span>
+<span class="fragment">const mapR= fn => pair => [pair[0], fn(pair[1])];</span>
+<span class="fragment">const map = fn => xs => xs.map(fn);</span>
+
+<span class="fragment">const getCustomerAndOrders = <span class="fragment highlight-current">customerId</span> => <span class="fragment highlight-current">p(customerId)</span>
+    .then(<span class="fragment highlight-current">pair(getCustomer, getCustomerAndOrders)</span>)
+    .then(<span class="fragment highlight-current">resolveAll</span>);</span>
+
+<span class="fragment">const mapOrdersToProviders = <span class="fragment highlight-current">pair</span> => <span class="fragment highlight-current">p(pair)</span>
+    .then(<span class="fragment highlight-current">mapR(getProviders)</span>)
+    .then(<span class="fragment highlight-current">resolveAll</span>);</span>
+
+<span class="fragment">const getProviders = <span class="fragment highlight-current">orders</span> => <span class="fragment highlight-current">p(orders)</span>
+    .then(<span class="fragment highlight-current">map(getOrderProvider)</span>)
+    .then(<span class="fragment highlight-current">resolveAll</span>);</span>
+
+<span class="fragment">const getOrderProvider = <span class="fragment highlight-current">order</span> => <span class="fragment highlight-current">getProvider(order.providerId)</span>;</span>
+
+<span class="fragment">const enhanceCustomer = <span class="fragment highlight-current">([customer, providers])</span> => <span class="fragment highlight-current">Object.assign(customer, {providers})</span>;</span>
+
+<span class="fragment">const getEnhancedCustomer = <span class="fragment highlight-current">customerId</span> => <span class="fragment highlight-current">p(customerId)</span>
+    .then(<span class="fragment highlight-current">getCustomerAndOrders</span>)
+    .then(<span class="fragment highlight-current">mapOrdersToProviders</span>)
+    .then(<span class="fragment highlight-current">enhanceCustomer</span>);</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Leave no state behind</h2>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-large data-wrap>
+function Log(<span class="fragment highlight-current" data-highlight="log-1">x</span>, <span class="fragment highlight-current" data-highlight="log-2">l = `${x} was created.`</span>) {
+    <span data-highlight="log-1">this._value = x</span>;
+    <span data-highlight="log-2">this._log = l</span>;
+}
+
+<span class="fragment">Log.prototype.chain = function(<span class="fragment highlight-current">fn</span>) {
+    <span class="fragment highlight-current">const log = fn(this._value)</span>;
+
+    <span class="fragment highlight-current">return new Log(<span class="fragment highlight-current">log._value</span>, <span class="fragment highlight-current">`${this._log}\n${log._log}`</span>)</span>;
+};</span>
+
+<span class="fragment">const double = <span class="fragment highlight-current">x</span> => <span class="fragment highlight-current">new Log(<span class="fragment highlight-current">x + x</span>, <span class="fragment highlight-current">`${x} was doubled.`</span>)</span>;</span>
+<span class="fragment">const cube = <span class="fragment highlight-current">x</span> => <span class="fragment highlight-current">new Log(<span class="fragment highlight-current">x * x * x</span>, <span class="fragment highlight-current">`${x} was cubed.`</span>)</span>;</span>
+
+<span class="fragment">(new Log(5)).chain(double).chain(cube).chain(double);</span>
+<span class="fragment output">Log {<span class="fragment highlight-current">_value: 2000</span>, <span class="fragment highlight-current">_log: "5 was created.↵5 was doubled.↵10 was cubed.↵1000 was doubled."</span>}</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+function Random(<span class="fragment highlight-current" data-highlight="random-1">s</span>) {
+    <span data-highlight="random-1">this._seed = s</span>;
+}
+
+<span class="fragment">Random.prototype.random = function() {
+    <span class="fragment highlight-current">const rng = seedrandom(this._seed)</span>;
+
+    return {
+        random: <span class="fragment highlight-current">new Random(rng())</span>,
+        value: <span class="fragment highlight-current">rng()</span>
+    };
+};</span>
+
+<span class="fragment">const <span class="fragment highlight-current">random</span> = <span class="fragment highlight-current">random</span> => <span class="fragment highlight-current">random.random()</span>;</span>
+
+<span class="fragment">random(new Random(0));</span>
+<span class="fragment output">{ random: Random { _seed: 0.038085370776470735 }, value: 0.08624634995353292 }</span>
+<span class="fragment">random(random(new Random(0)).random);</span>
+<span class="fragment output">{ random: Random { _seed: 0.9660765498440191 }, value: 0.2928875124398036 }</span>
+<span class="fragment">random(random(random(new Random(0)).random).random);</span>
+<span class="fragment output">{ random: Random { _seed: 0.864238791304428 }, value: 0.5300090470550506 }</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <pre><code class="js" data-trim data-noescape data-wrap data-large>
+function Task(fn) {
+    this._value = fn;
+}
+
+<span class="fragment">Task.prototype.chain = function(<span class="fragment highlight-current">fn</span>) {
+    return new Task(<span class="fragment highlight-current">(...args)</span> => <span class="fragment highlight-current">this._value(...args)</span>.<span class="fragment highlight-current">then(fn)</span>);
+};</span>
+
+<span class="fragment">Task.prototype.run = function(<span class="fragment highlight-current">...args</span>) {
+    return <span class="fragment highlight-current">this._value(...args)</span>;
+};</span>
+
+<span class="fragment">const getEnhancedCustomer = customerId => <span data-highlight="task-1">p(customerId)</span>
+    .<span data-highlight="task-2">then</span>(getCustomerAndOrders)
+    .<span data-highlight="task-2">then</span>(mapOrdersToProviders)
+    .<span data-highlight="task-2">then</span>(enhanceCustomer);</span>
+
+<span class="fragment">const getEnhancedCustomerᐟ = customerId => <span class="fragment highlight-current" data-highlight="task-1">new Task(() => p(customerId))</span>
+    .<span class="fragment highlight-current" data-highlight="task-2">chain</span>(getCustomerAndOrders)
+    .<span data-highlight="task-2">chain</span>(mapOrdersToProviders)
+    .<span data-highlight="task-2">chain</span>(enhanceCustomer);</span>
+
+<span class="fragment">const enhancedCustomerPromise = getEnhancedCustomer(1337); // Impure</span>
+<span class="fragment">const enhancedCustomerTask = getEnhancedCustomerᐟ(1337); // Pure</span>
+<span class="fragment">const enhancedCustomerPromiseᐟ = enhancedCustomerTask.run(); // Impure</span>
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>But wait, there's more!</h2>
+                    </section>
+                    <section>
+                        <h2>Don't give up!</h2>
+                    </section>
                 </section>
                 <section data-quit>
                     <h2>Questions?</h2>
@@ -39,6 +835,13 @@
                 <section data-markdown>
                     <script type="text/template">
 ## References
+* [ECMAScript This-Binding Syntax](https://github.com/tc39/proposal-bind-operator)
+* [ESNext Proposal: The Pipeline Operator](https://github.com/gilbert/es-pipeline-operator)
+* [Professor Frisby's Mostly Adequate Guide to Functional Programming](https://drboolean.gitbooks.io/mostly-adequate-guide/content/) by Brian Lonsdorf
+* [Professor Frisby Introduces Composable Functional JavaScript](https://egghead.io/courses/professor-frisby-introduces-composable-functional-javascript) by Brian Lonsdorf
+* [Your code could be better and I can prove it mathematically](http://fun.ction.al/en/#/) by Martín Valdés de León
+* [Fantasy Land Specification](https://github.com/fantasyland/fantasy-land)
+* ["Fantas, Eel, and Specification" series](http://www.tomharding.me/) by Tom Harding
                     </script>
                 </section>
                 <section>
@@ -47,7 +850,7 @@
             </div>
         </div>
         <div class="sources">
-            <!-- <div class="source" data-source="category"><a href="https://en.wikipedia.org/wiki/Category_(mathematics)" target="_blank">https://en.wikipedia.org/wiki/Category_(mathematics)</a></div> -->
+            <div class="source light" data-source="learning-curve"><a href="https://github.com/Dobiasd/articles/blob/master/programming_language_learning_curves/haskell.png" target="_blank">https://github.com/Dobiasd/articles/blob/master/programming_language_learning_curves/haskell.png</a></div>
         </div>
         <div class="blank">
             <div class="text">This slide intentionally left blank</div>
