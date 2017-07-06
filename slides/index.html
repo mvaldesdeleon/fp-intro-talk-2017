@@ -500,7 +500,7 @@ const orders = [{paid: false, total: 20}, {paid: true, total: 10}, {paid: true, 
 <span class="fragment">const and = pra => prb => x => pra(x) && prb(x);</span>
 <span class="fragment">const filterOrdersᐟ = filter(and(paid)(large));</span>
 
-<span class="fragment">processOrders(orders) == processOrdersᐟ(orders);</span>
+<span class="fragment">filterOrders(orders) == filterOrdersᐟ(orders);</span>
 <span class="fragment output">true</span>
                         </code></pre>
                     </section>
